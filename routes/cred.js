@@ -21,8 +21,12 @@ router.post('/login', (req, res)=>{
     var sql = "SELECT * from customers WHERE email=? AND password=?";
     var cust = req.body;
     connection.query(sql, [cust.email, cust.password], (err, row)=>{
-        if(!err)
-            res.send(row);
+        if(!err){
+            if(row[0])
+                res.send(row);
+            else    
+                res.send("Wrong Credentials entered. Please give the correct username and password");
+        }
         else    
             res.send(JSON.stringify(err));
     });
