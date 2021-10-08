@@ -1,12 +1,21 @@
 const express = require('express');
 const app = express();
+const basicAuth = require('express-basic-auth');
 const custRoutes = require('./routes/cred');
+
 
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({
     extended: true
+}));
+
+app.use('/customer', basicAuth({
+    users : { 'test':'passcode' },
+    unauthorizedResponse: (req) => {
+        return `Basic Auth Failed`
+    }
 }));
 
 app.use('/customer', custRoutes);
