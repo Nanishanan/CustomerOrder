@@ -2,7 +2,10 @@ const express = require('express');
 const app = express();
 const basicAuth = require('express-basic-auth');
 const custRoutes = require('./routes/cred');
+const dotenv = require('dotenv');
+const schedules = require('./middleware/schedule');
 
+dotenv.config( {path: './.env'} );
 
 const port = process.env.PORT || 3000;
 
@@ -19,6 +22,7 @@ app.use('/customer', basicAuth({
 }));
 
 app.use('/customer', custRoutes);
+// app.use('/schedule', schedules);
 
 app.get('/', (req, res)=>{
     res.send("<h1>Welcome to Home Page</h1>");
