@@ -23,7 +23,6 @@ router.post('/signup', (req, res)=>{
     });
 });
 
-
 //Login API
 router.post('/login', (req, res)=>{
     var sql = "SELECT * from customers WHERE email=? AND password=?";
@@ -38,6 +37,20 @@ router.post('/login', (req, res)=>{
                 res.send("Wrong Credentials entered. Please give the correct username and password");
         }
         else    
+            res.send(JSON.stringify(err));
+    });
+});
+
+//Update password
+router.post('/:id/changepassword', auth, (req, res)=>{
+    var sql = "update customers set password=? where (id=? AND password=?)";
+    connection.query(sql, [req.body.newPassword, req.params.id, req.body.oldPassword], (err, row)=>{
+        if(!err){
+            if(row.info[14] == "0")
+                return res.send("Old Password Incorrect");
+            else
+                return res.send("Password Changed")
+        } else  
             res.send(JSON.stringify(err));
     });
 });
