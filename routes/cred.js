@@ -75,10 +75,23 @@ router.post('/order', auth, (req, res)=>{
     });
 });
 
-router.get('/orderDetails', auth, (req, res)=>{
-    var sql = "SELECT * from orders";
+//Order details for specific order
+router.get('/orderDetails/:orderID/', auth, (req, res)=>{
+    var sql = "SELECT * from subOrders where orderID=?";
 
-    connection.query(sql, (err, rows)=>{
+    connection.query(sql, [req.params.orderID], (err, rows)=>{
+        if(!err)
+            return res.send(rows);
+        else
+            return res.send(JSON.stringify(err));
+    });
+});
+
+//All order details
+router.get('/orderDetails', auth, (req, res)=>{
+    var sql = "SELECT * from orders where id=?";
+
+    connection.query(sql, [req.body.id], (err, rows)=>{
         if(!err)
             return res.send(rows);
         else
