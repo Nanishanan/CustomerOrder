@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const auth = require('../controller/jwtAuth');
 const dotenv = require('dotenv');
 dotenv.config( {path: './.env'} );
+const bcrypt = require('bcrypt');
+
 
 //Signup Customer API
 router.post('/signup', (req, res)=>{
@@ -13,26 +15,30 @@ router.post('/signup', (req, res)=>{
     CALL insertorupdatecust(@id, @name, @email, @password, @mobile, @deviceName, @deviceModel, @firebaseID)";
     var cust = req.body;
 
-    connection.query(sql, [0, cust.name, cust.email, cust.password, cust.mobile, cust.deviceName, cust.deviceModel, cust.firebaseID], (err, rows)=>{
-        if(!err)
+    var hashedPassword = bcrypt.hashSync(cust.password, 8);
+    // res.send(hashedPassword);
+
+    connection.query(sql, [0, cust.name, cust.email, hashedPassword, cust.mobile, cust.deviceName, cust.deviceModel, cust.firebaseID], (err, row)=>{
+        if(!err){
             // return res.send(rows[8]);
+            console.log(hashedPassword);
             return res.json({row: row[8], token: generateAuth(row[8].password)});
-        else    
+        } else {
             console.log("Error inserting record" +JSON.stringify(err));
             return res.send(JSON.stringify(err));
+        }
     });
 });
 
 //Login API
 router.post('/login', (req, res)=>{
-    var sql = "SELECT * from customers WHERE email=? AND password=?";
+    var sql = "SELECT * from customers WHERE email=?";
     var cust = req.body;
-    connection.query(sql, [cust.email, cust.password], (err, row)=>{
+
+    connection.query(sql, [cust.email], (err, row)=>{
         if(!err){
-            if(row[0]) {
-                res.json({row: row, token: generateAuth(row[0].password)});
-                // res.end();
-                // console.log(generateAuth(row[0].password));
+            if(row[0] && (bcrypt.compareSync(cust.password, row[0].password))) {
+                res.send(row[0]);
             } else    
                 res.send("Wrong Credentials entered. Please give the correct username and password");
         }
