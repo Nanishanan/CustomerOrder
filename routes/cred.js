@@ -88,10 +88,10 @@ router.get('/orderDetails/:orderID/', auth, (req, res)=>{
 });
 
 //All order details
-router.get('/orderDetails', auth, (req, res)=>{
+router.get('/orders/:id', auth, (req, res)=>{
     var sql = "SELECT * from orders where id=?";
 
-    connection.query(sql, [req.body.id], (err, rows)=>{
+    connection.query(sql, [req.params.id], (err, rows)=>{
         if(!err)
             return res.send(rows);
         else
