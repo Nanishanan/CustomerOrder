@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const auth = require('../controller/jwtAuth');
 const dotenv = require('dotenv');
 dotenv.config( {path: './.env'} );
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 
 //Signup Customer API
@@ -21,7 +21,7 @@ router.post('/signup', (req, res)=>{
     connection.query(sql, [0, cust.name, cust.email, hashedPassword, cust.mobile, cust.deviceName, cust.deviceModel, cust.firebaseID], (err, row)=>{
         if(!err){
             // return res.send(rows[8]);
-            console.log(hashedPassword);
+            // console.log(hashedPassword);
             return res.json({row: row[8], token: generateAuth(row[8].password)});
         } else {
             console.log("Error inserting record" +JSON.stringify(err));
